@@ -1883,12 +1883,6 @@ const inputSlider = () => {
                     height: 80px;
                     outline: none;
                     resize: none;
-                    &:focus-visible {
-                      border: 0px !important;
-                    }
-                    &:focus {
-                      border: 0px !important;
-                    }
                   }
                 }
               }
