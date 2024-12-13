@@ -12,44 +12,35 @@
           <div class="menu_wrap">
             <div
               class="item"
-              @click="sidebar = 1"
-              :style="{ opacity: sidebar === 1 ? 1 : 0.6 }"
+              @click="sidebarClick(subItem)"
+              :style="{
+                opacity:
+                  userStore.router.sidebar === subItem.meta.name ? 1 : 0.6,
+              }"
+              v-for="subItem in menuList"
+              :key="subItem.path"
             >
               <div class="item__icon">
                 <el-icon
                   :size="20"
-                  :color="sidebar === 1 ? '#233cce' : '#1d1e20'"
-                  ><User
-                /></el-icon>
+                  :color="
+                    userStore.router.sidebar === subItem.meta.name
+                      ? '#233cce'
+                      : '#1d1e20'
+                  "
+                  ><component :is="subItem.meta.icon"></component
+                ></el-icon>
               </div>
               <div
                 class="item__text"
                 :style="{
-                  fontWeight: sidebar === 1 ? '600' : '400',
+                  fontWeight:
+                    userStore.router.sidebar === subItem.meta.name
+                      ? '600'
+                      : '400',
                 }"
               >
-                账号
-              </div>
-            </div>
-            <div
-              class="item"
-              @click="sidebar = 2"
-              :style="{ opacity: sidebar === 2 ? 1 : 0.6 }"
-            >
-              <div class="item__icon">
-                <el-icon
-                  :size="20"
-                  :color="sidebar === 2 ? '#233cce' : '#1d1e20'"
-                  ><ChatLineSquare
-                /></el-icon>
-              </div>
-              <div
-                class="item__text"
-                :style="{
-                  fontWeight: sidebar === 2 ? '600' : '400',
-                }"
-              >
-                聊天室
+                {{ subItem.meta.title }}
               </div>
             </div>
           </div>
@@ -57,14 +48,18 @@
 
         <!-- 个人信息按钮 -->
         <div class="sidebar_footer">
-          <el-dropdown placement="top-start" trigger="click">
+          <el-dropdown
+            placement="top-start"
+            trigger="click"
+            @command="handleCommand"
+          >
             <div class="userinfo_wrap">L</div>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item style="pointer-events: none"
                   >用户名：123123123</el-dropdown-item
                 >
-                <el-dropdown-item>退出登录</el-dropdown-item>
+                <el-dropdown-item command="outLogin">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -224,14 +219,16 @@
                 />
               </div>
               <div class="username_">laotao1-wtg003</div>
-              <el-dropdown trigger="click"
+              <el-dropdown trigger="click" @command="handleCommand"
                 ><el-icon><ArrowDown /></el-icon>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item style="pointer-events: none"
                       >登录记录</el-dropdown-item
                     >
-                    <el-dropdown-item>退出登录</el-dropdown-item>
+                    <el-dropdown-item command="outLogin"
+                      >退出登录</el-dropdown-item
+                    >
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -398,187 +395,104 @@
             <div class="chat_dialog_main">
               <el-scrollbar height="500px" ref="scrollbarRef">
                 <div class="inner_">
-                  <div class="msg_content system_tip">
-                    <div class="tip_wrap">
-                      <div class="text_original">11-27</div>
-                    </div>
-                  </div>
-                  <div class="msg_content left_">
-                    <div class="start_">
-                      <div class="headimg_">
-                        <el-image
-                          src="https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg"
-                          style="width: 100%; height: 100%"
-                          alt=""
-                          :preview-src-list="[
-                            'https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg',
-                          ]"
-                        />
+                  <div
+                    v-for="(item, index) in msgList"
+                    :key="`msgList_${index}`"
+                  >
+                    <div
+                      class="msg_content system_tip"
+                      v-if="item.type === 'tip'"
+                    >
+                      <div class="tip_wrap">
+                        <div class="text_original">11-27</div>
                       </div>
                     </div>
-                    <div class="center_">
-                      <div class="title_">
-                        <div class="name_">Telegram</div>
-                      </div>
-                      <div class="msg_wrap">
-                        <div class="msg_box">
-                          <el-dropdown placement="bottom" trigger="contextmenu">
-                            <div class="text_original" style="color: #1d1e20">
-                              Login code: 96934. Do not give this code to
-                              anyone, even if they say they are from Telegram!
-                              This code can be used to log in to your Telegram
-                              account. We never ask it for anything else. If you
-                              didn't request this code by trying to log in on
-                              another device, simply ignore this message.
-                            </div>
-                            <template #dropdown>
-                              <el-dropdown-menu>
-                                <el-dropdown-item @click="copy"
-                                  >复制</el-dropdown-item
-                                >
-                                <el-dropdown-item>删除消息</el-dropdown-item>
-                              </el-dropdown-menu>
-                            </template>
-                          </el-dropdown>
-                        </div>
-                        <div class="msg_ext">
-                          <div class="time_">16:58:54</div>
-                          <div class="read_">已阅</div>
+                    <div class="msg_content left_" v-if="item.type === 'left'">
+                      <div class="start_">
+                        <div class="headimg_">
+                          <el-image
+                            src="https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg"
+                            style="width: 100%; height: 100%"
+                            alt=""
+                            :preview-src-list="[
+                              'https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg',
+                            ]"
+                          />
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  <div class="msg_content right_">
-                    <div class="start_">
-                      <div class="headimg_">
-                        <el-image
-                          src="https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg"
-                          style="width: 100%; height: 100%"
-                          alt=""
-                          :preview-src-list="[
-                            'https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg',
-                          ]"
-                        />
-                      </div>
-                    </div>
-                    <div class="center_">
-                      <div class="title_">
-                        <div class="name_">奇怪</div>
-                      </div>
-                      <div class="msg_wrap">
-                        <div class="msg_box">
-                          <el-dropdown placement="bottom" trigger="contextmenu">
-                            <div class="text_original" style="color: #fff">
-                              Login code: 96934. Do not give this code to
-                              anyone, even if they say they are from Telegram!
-                              This code can be used to log in to your Telegram
-                              account. We never ask it for anything else. If you
-                              didn't request this code by trying to log in on
-                              another device, simply ignore this message.
-                            </div>
-                            <template #dropdown>
-                              <el-dropdown-menu>
-                                <el-dropdown-item @click="copy"
-                                  >复制</el-dropdown-item
-                                >
-                                <el-dropdown-item>删除消息</el-dropdown-item>
-                              </el-dropdown-menu>
-                            </template>
-                          </el-dropdown>
+                      <div class="center_">
+                        <div class="title_">
+                          <div class="name_">Telegram</div>
                         </div>
-                        <div class="msg_ext">
-                          <div class="time_">16:58:54</div>
-                          <!-- <div class="read_">已阅</div> -->
+                        <div class="msg_wrap">
+                          <div class="msg_box">
+                            <el-dropdown
+                              placement="bottom"
+                              trigger="contextmenu"
+                            >
+                              <div class="text_original" style="color: #1d1e20">
+                                {{ item.content }}
+                              </div>
+                              <template #dropdown>
+                                <el-dropdown-menu>
+                                  <el-dropdown-item @click="copy"
+                                    >复制</el-dropdown-item
+                                  >
+                                  <el-dropdown-item>删除消息</el-dropdown-item>
+                                </el-dropdown-menu>
+                              </template>
+                            </el-dropdown>
+                          </div>
+                          <div class="msg_ext">
+                            <div class="time_">16:58:54</div>
+                            <div class="read_">已阅</div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="msg_content right_">
-                    <div class="start_">
-                      <div class="headimg_">
-                        <el-image
-                          src="https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg"
-                          style="width: 100%; height: 100%"
-                          alt=""
-                          :preview-src-list="[
-                            'https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg',
-                          ]"
-                        />
-                      </div>
-                    </div>
-                    <div class="center_">
-                      <div class="title_">
-                        <div class="name_">奇怪</div>
-                      </div>
-                      <div class="msg_wrap">
-                        <div class="msg_box">
-                          <el-dropdown placement="bottom" trigger="contextmenu">
-                            <div class="text_original" style="color: #fff">
-                              Login code: 96934. Do not give this code to
-                              anyone, even if they say they are from Telegram!
-                              This code can be used to log in to your Telegram
-                              account. We never ask it for anything else. If you
-                              didn't request this code by trying to log in on
-                              another device, simply ignore this message.
-                            </div>
-                            <template #dropdown>
-                              <el-dropdown-menu>
-                                <el-dropdown-item @click="copy"
-                                  >复制</el-dropdown-item
-                                >
-                                <el-dropdown-item>删除消息</el-dropdown-item>
-                              </el-dropdown-menu>
-                            </template>
-                          </el-dropdown>
-                        </div>
-                        <div class="msg_ext">
-                          <div class="time_">16:58:54</div>
-                          <!-- <div class="read_">已阅</div> -->
+                    <div
+                      class="msg_content right_"
+                      v-if="item.type === 'right'"
+                    >
+                      <div class="start_">
+                        <div class="headimg_">
+                          <el-image
+                            src="https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg"
+                            style="width: 100%; height: 100%"
+                            alt=""
+                            :preview-src-list="[
+                              'https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg',
+                            ]"
+                          />
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  <div class="msg_content right_">
-                    <div class="start_">
-                      <div class="headimg_">
-                        <el-image
-                          src="https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg"
-                          style="width: 100%; height: 100%"
-                          alt=""
-                          :preview-src-list="[
-                            'https://fs.tgzai.com/images/2024/05/05/cor6dfo51g3s72pja1o0.jpeg',
-                          ]"
-                        />
-                      </div>
-                    </div>
-                    <div class="center_">
-                      <div class="title_">
-                        <div class="name_">奇怪</div>
-                      </div>
-                      <div class="msg_wrap">
-                        <div class="msg_box">
-                          <el-dropdown placement="bottom" trigger="contextmenu">
-                            <div class="text_original" style="color: #fff">
-                              Login code: 96934. Do not give this code to
-                              anyone, even if they say they are from Telegram!
-                              This code can be used to log in to your Telegram
-                              account. We never ask it for anything else. If you
-                              didn't request this code by trying to log in on
-                              another device, simply ignore this message.
-                            </div>
-                            <template #dropdown>
-                              <el-dropdown-menu>
-                                <el-dropdown-item @click="copy"
-                                  >复制</el-dropdown-item
-                                >
-                                <el-dropdown-item>删除消息</el-dropdown-item>
-                              </el-dropdown-menu>
-                            </template>
-                          </el-dropdown>
+                      <div class="center_">
+                        <div class="title_">
+                          <div class="name_">奇怪</div>
                         </div>
-                        <div class="msg_ext">
-                          <div class="time_">16:58:54</div>
-                          <!-- <div class="read_">已阅</div> -->
+                        <div class="msg_wrap">
+                          <div class="msg_box">
+                            <el-dropdown
+                              placement="bottom"
+                              trigger="contextmenu"
+                            >
+                              <div class="text_original" style="color: #fff">
+                                {{ item.content }}
+                              </div>
+                              <template #dropdown>
+                                <el-dropdown-menu>
+                                  <el-dropdown-item @click="copy"
+                                    >复制</el-dropdown-item
+                                  >
+                                  <el-dropdown-item>删除消息</el-dropdown-item>
+                                </el-dropdown-menu>
+                              </template>
+                            </el-dropdown>
+                          </div>
+                          <div class="msg_ext">
+                            <div class="time_">16:58:54</div>
+                            <!-- <div class="read_">已阅</div> -->
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -810,13 +724,14 @@
                   type="text"
                   class="paperview-input-text"
                   placeholder="输入消息..."
+                  v-model="sendValue"
                 />
               </div>
 
               <div class="actions_">
                 <div class="start_"></div>
                 <div class="end_">
-                  <el-button color="#6f50ff">发送</el-button>
+                  <el-button color="#6f50ff" @click="send">发送</el-button>
                 </div>
               </div>
             </div>
@@ -826,7 +741,12 @@
               <div class="chat_quick_center">
                 <div class="title_">备忘录</div>
                 <div class="meno_list">
-                  <div class="meno_item">123</div>
+                  <div
+                    class="meno_item"
+                    v-for="(item, index) in memorandumList"
+                  >
+                    {{ item.label }}
+                  </div>
                 </div>
                 <div class="meno_ctrl">
                   <div class="input_wrap">
@@ -834,11 +754,13 @@
                       type="text"
                       class="paperview-input-text"
                       placeholder="请输入内容..."
+                      v-model="memorandum"
                     />
                   </div>
                   <el-button
                     type="primary"
                     style="width: 100%; margin-top: 10px"
+                    @click="submitMemorandum"
                     >提交</el-button
                   >
                 </div>
@@ -978,10 +900,62 @@
 import { Calendar, Search } from "@element-plus/icons-vue";
 import { ref, onMounted, nextTick } from "vue";
 
+import router from "@/router";
+import { useUserInfo } from "@/store/index.js";
+
+// 退出登录
+const handleCommand = (command) => {
+  console.log("123");
+  if (command === "outLogin") {
+    outLogin();
+  }
+};
+
+const outLogin = () => {
+  console.log("456");
+  userStore.$reset();
+  router.push("/login");
+};
+
 onMounted(async () => {
   await nextTick();
   inputSlider();
 });
+
+const userStore = useUserInfo();
+
+const routerList = router.getRoutes();
+const menuList = routerList.filter((item) => {
+  console.log(item.meta.title, item.meta.isDetails);
+  if (
+    item.meta &&
+    item.meta.title &&
+    item.children.length > 0 // 必须有children
+    // item.meta.root.includes(useStore.user.role) // 符合当前用户权限
+  )
+    return item;
+});
+
+const sidebarClick = (event) => {
+  // sidebar.value = event.meta.name;
+  // list.value = event.children;
+  // active.value = event.children[0].name;
+  // title.value = event.children[0].meta.title;
+
+  userStore.router.sidebar = event.meta.name;
+  userStore.router.list = event.children;
+  userStore.router.active = event.children[0].name;
+  userStore.router.title = event.children[0].meta.title;
+
+  itemsClick(userStore.router.list[0]);
+};
+
+const itemsClick = (event) => {
+  userStore.router.active = event.name;
+  userStore.router.path = event.path;
+  userStore.router.title = event.meta.title;
+  router.push(event.path);
+};
 
 const sidebar = ref(2);
 const active = ref(1);
@@ -1012,6 +986,29 @@ const copy = () => {
 const scrollbarRef = ref();
 const inputSlider = () => {
   scrollbarRef.value.setScrollTop(500);
+};
+
+// 发送消息
+const sendValue = ref("");
+const msgList = ref([]);
+const send = () => {
+  if (!sendValue.value) return;
+  msgList.value.push({
+    content: sendValue.value,
+    type: "right",
+  });
+  sendValue.value = "";
+};
+
+//备忘录
+const memorandumList = ref([]);
+const memorandum = ref("");
+const submitMemorandum = () => {
+  if (!memorandum.value) return;
+  memorandumList.value.push({
+    label: memorandum.value,
+  });
+  memorandum.value = "";
 };
 </script>
 
@@ -1862,6 +1859,7 @@ const inputSlider = () => {
                   font-size: 14px;
                   line-height: 1.25;
                   overflow-wrap: break-word;
+                  margin-bottom: 10px;
                   padding: 10px;
                   -webkit-user-select: text;
                   user-select: text;

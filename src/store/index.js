@@ -5,6 +5,13 @@ export const useUserInfo = defineStore("userInfo", {
     userInfo: null,
     type: null,
     token: null,
+    router: {
+      sidebar: null,
+      list: [],
+      active: null,
+      title: null,
+      path: "",
+    },
   }),
 
   persist: {
