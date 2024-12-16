@@ -125,7 +125,7 @@
             type="primary"
             color="#a755e5"
             style="font-size: 12px"
-            @click="dialogAddMassSending = true"
+            @click="addDialog = true"
             icon="Plus"
             >创建素材分组</el-button
           >
@@ -226,6 +226,133 @@
         </div>
       </div>
     </div>
+
+    <el-dialog
+      v-model="addDialog"
+      title="创建素材分组"
+      width="550"
+      draggable
+      top="10vh"
+    >
+      <div class="bodyItem">
+        <div class="dialogForm">
+          <div class="form-item" style="flex-basis: 100%">
+            <div class="label">名称：</div>
+            <div class="">
+              <el-input
+                v-model="addForm.name"
+                size="large"
+                style="width: 100%"
+                clearable
+                placeholder="名称"
+              >
+              </el-input>
+            </div>
+          </div>
+
+          <div class="form-item" style="flex-basis: 100%">
+            <div class="label">状态：</div>
+            <div class="">
+              <el-select
+                v-model="addForm.status"
+                size="large"
+                style="width: 100%"
+                placeholder="状态"
+              >
+                <el-option
+                  v-for="item in [
+                    { label: '启用', value: 1 },
+                    { label: '禁用', value: -1 },
+                  ]"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+          </div>
+
+          <div class="form-item" style="flex-basis: 100%">
+            <div class="label">快捷回复：</div>
+            <div class="">
+              <el-select
+                v-model="addForm.convenient"
+                size="large"
+                style="width: 100%"
+                placeholder="状态"
+              >
+                <el-option
+                  v-for="item in [
+                    { label: '启用', value: 1 },
+                    { label: '禁用', value: -1 },
+                  ]"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+          </div>
+
+          <div class="form-item" style="flex-basis: 100%">
+            <div class="label">素材类型：</div>
+            <div class="">
+              <el-select
+                v-model="addForm.status"
+                size="large"
+                style="width: 100%"
+                placeholder="素材类型"
+              >
+                <el-option
+                  v-for="item in editTypeList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+          </div>
+
+          <div class="form-item" style="flex-basis: 100%">
+            <div class="label">优先级：</div>
+            <div class="">
+              <el-input-number
+                v-model="addForm.sort"
+                size="large"
+                style="width: 100%; text-align: left"
+                clearable
+                placeholder="优先级"
+                :controls="false"
+              >
+              </el-input-number>
+            </div>
+          </div>
+
+          <div class="form-item" style="flex-basis: 100%">
+            <div class="label">备注：</div>
+            <div class="">
+              <el-input
+                v-model="addForm.name"
+                size="large"
+                style="width: 100%"
+                clearable
+                placeholder="备注"
+              >
+              </el-input>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="addClose()" size="large">取消</el-button>
+          <el-button type="primary" @click="addSubmit()" size="large">
+            提交
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
 
     <el-dialog
       v-model="editDialog"
@@ -365,6 +492,19 @@ const getTableData = async () => {};
 getTableData();
 
 // 创建模板
+const addDialog = ref(false);
+const addForm = ref({});
+
+const addSubmit = () => {
+  ElMessage.success("提交成功");
+  addDialog.value = false;
+};
+
+const addClose = () => {
+  addForm.value = {};
+  addDialog.value = false;
+};
+
 const editDialog = ref(false);
 const editForm = ref({});
 const title = ref("");
